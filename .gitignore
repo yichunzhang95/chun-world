@@ -1,0 +1,9 @@
+# macOS
+.DS_Store
+
+# Untouched camera originals — kept locally as backups before rotate/resize.
+# 27MB the site never serves; make sure these also live in Photos or Drive.
+media/originals/
+
+# Shot from the run club set that no slot currently uses (7.8MB)
+media/2026_0523_Run_Club_60.jpg
