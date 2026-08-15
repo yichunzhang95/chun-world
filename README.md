@@ -53,6 +53,20 @@ The page has **four navigable sections** — Who I am, What I do, Where I'm at, 
 
 **Where I'm at** is a five-row label/value list — Building, Training, Learning, Where, Focused on. Edit the `<dt>`/`<dd>` pairs; add or drop rows by copying a `.now-row` block.
 
+## Favicon
+
+A cream "C" in Fraunces on the palette's deep ink. Three files at the repo root:
+
+| File | Used for | Ink coverage |
+|---|---|---|
+| `favicon-16.png` | Browser tab | 12.1% |
+| `favicon-32.png` | Browser tab | 11.5% |
+| `apple-touch-icon.png` | iOS home screen | 8.2% |
+
+**Every size is rendered natively — none is downscaled from a master**, and that's the whole trick. Fraunces is a high-contrast serif, so area-averaging a 512px render down to 16px washes its hairline strokes into the background: the first attempt measured 3 light pixels out of 256, an effectively blank square. Each file is instead drawn at its target size, with the small ones using a heavier weight (600) and tighter fill so the strokes stay thick enough to read. That's deliberate optical sizing — if you regenerate these, don't "simplify" it by scaling one master to all three.
+
+If you do regenerate them, **measure the result** rather than trusting that the file looks like a PNG. Both failure modes here produced structurally valid PNGs of exactly the right dimensions while being visually blank. Load the file into a canvas and count pixels above ~140 luminance; anything under ~5% means the mark has disappeared.
+
 ## How it's put together
 
 - Palette and type come from your existing chun.mov link page (Fraunces + Space Mono, amber, warm paper), inverted to light.
