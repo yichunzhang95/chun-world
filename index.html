@@ -718,9 +718,10 @@ footer.wrap{padding-block:clamp(3.5rem,7vh,5rem)}
         return;
       }
 
-      /* short trips stay short; a full-page jump tops out at 700ms, and
-         ease-out means half the distance is covered in the first ~110ms */
-      var duration = Math.min(700, Math.max(350, Math.abs(distance) * 0.28));
+      /* short trips stay short; a full-page jump tops out at 900ms, and
+         ease-out means half the distance is covered in the first ~145ms, so
+         the extra length reads as a longer glide rather than a slower start */
+      var duration = Math.min(900, Math.max(450, Math.abs(distance) * 0.35));
       var t0 = null;
       var cancelled = false;
 
