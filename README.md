@@ -81,7 +81,9 @@ If you do regenerate them, **measure the result** rather than trusting that the 
 
 - Palette and type come from your existing chun.mov link page (Fraunces + Space Mono, amber, warm paper), inverted to light.
 - Scroll behaviour: reveal-on-enter via one `IntersectionObserver` (fires once, then unobserves), navs that track the active section, a top bar that tightens up once the hero is behind you, a scroll-progress bar, sticky marginal photos, and a slow hero drift.
-- **Nav clicks jump instantly.** `scroll-behavior` is left at `auto` and there is no JS easing — an animated scroll was tried and read as lag. If you reinstate smooth scrolling, note that `overflow-x` must stay on `html` rather than `body`, or Chrome ignores `scroll-behavior` entirely.
+- **Nav clicks run an eased scroll in JS** (`easeOutQuart`, 350–700ms by distance), with wheel or touch cancelling it mid-flight.
+- **`scroll-behavior` must stay `auto`.** The animation calls `window.scrollTo` once per frame; with `smooth` set, each of those calls starts its own native animation toward the target, so the page trails the values being set and every jump feels rubber-banded. That combination is what made the scroll feel delayed, and it is easy to reintroduce by "helpfully" adding `scroll-behavior: smooth` back.
+- The curve is ease-**out**, deliberately. An ease-in-out covers under 1% of the distance in its first 10% of time, so the page looks frozen right after the click. Ease-out is at 34% by then.
 - The bar's minimise is driven by its own `IntersectionObserver` on the hero, **not** by the scroll handler. That handler is rAF-throttled, so in a background tab it stalls and the bar would freeze in whichever state it was last in.
 - `prefers-reduced-motion: reduce` collapses all of it to instant. With JavaScript disabled the page renders fully visible rather than blank.
 - Contrast is AA-clean: body 15.9:1, secondary text 5.0:1, amber labels 5.25:1. `--amber` is decorative only; `--amber-deep` is the text-safe accent. If you change the palette, keep that split.

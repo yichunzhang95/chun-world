@@ -35,9 +35,12 @@
 }
 
 *,*::before,*::after{box-sizing:border-box}
-/* scroll-behavior is deliberately left at `auto`: nav clicks jump instantly.
+/* scroll-behavior MUST stay `auto`. The eased scroll in the script drives the
+   page with window.scrollTo once per frame; with `smooth` set, each of those
+   calls starts its own native animation toward the target, so the page trails
+   the values being set and every jump feels rubber-banded and late.
    overflow-x belongs on html rather than body, which would otherwise become
-   the scroll container */
+   the scroll container. */
 html{-webkit-text-size-adjust:100%;overflow-x:hidden}
 body{
   margin:0;
@@ -677,7 +680,8 @@ footer.wrap{padding-block:clamp(3.5rem,7vh,5rem)}
     else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
   });
 
-  /* close on navigate — the browser's own jump to the anchor still happens */
+  /* close on navigate — the eased scroll below still runs, and unlocking here
+     happens synchronously, before the animation starts on the next frame */
   drawer.querySelectorAll('a').forEach(function (a) {
     a.addEventListener('click', function () { closeMenu(false); });
   });
@@ -688,9 +692,62 @@ footer.wrap{padding-block:clamp(3.5rem,7vh,5rem)}
     if (menuOpen() && window.innerWidth >= 1000) closeMenu(false);
   });
 
-  /* Nav links are left as plain anchors: the browser jumps straight to the
-     section. No JS easing and no CSS smooth scrolling — the animated version
-     read as lag. */
+  /* ---- eased scroll when a nav link is clicked ----
+     Ease-OUT, not ease-in-out. An ease-in-out curve covers under 1% of the
+     distance in its first 10% of time, so the page appears to sit still after
+     the click before catching up — that stall was the "delay". This starts at
+     full speed and decelerates into place, matching the --ease token used for
+     everything else on the page. */
+  function easeOutQuart(t) { return 1 - Math.pow(1 - t, 4); }
+
+  document.querySelectorAll('[data-nav] a[href^="#"]').forEach(function (link) {
+    link.addEventListener('click', function (e) {
+      var hash = link.getAttribute('href');
+      var target = document.getElementById(hash.slice(1));
+      if (!target) return;
+      e.preventDefault();
+
+      var start = window.scrollY;
+      var maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      var end = Math.max(0, Math.min(target.getBoundingClientRect().top + start, maxScroll));
+      var distance = end - start;
+
+      if (reduce || distance === 0) {
+        window.scrollTo(0, end);
+        history.replaceState(null, '', hash);
+        return;
+      }
+
+      /* short trips stay short; a full-page jump tops out at 700ms, and
+         ease-out means half the distance is covered in the first ~110ms */
+      var duration = Math.min(700, Math.max(350, Math.abs(distance) * 0.28));
+      var t0 = null;
+      var cancelled = false;
+
+      function abort() { cancelled = true; cleanup(); }
+      function cleanup() {
+        window.removeEventListener('wheel', abort);
+        window.removeEventListener('touchstart', abort);
+      }
+      /* let the user take back control mid-flight */
+      window.addEventListener('wheel', abort, { passive: true });
+      window.addEventListener('touchstart', abort, { passive: true });
+
+      function step(now) {
+        if (cancelled) return;
+        if (t0 === null) t0 = now;   /* clock starts on the first painted frame */
+        var p = Math.min((now - t0) / duration, 1);
+        window.scrollTo(0, start + distance * easeOutQuart(p));
+        if (p < 1) {
+          requestAnimationFrame(step);
+        } else {
+          cleanup();
+          history.replaceState(null, '', hash);
+        }
+      }
+      requestAnimationFrame(step);
+    });
+  });
 
   /* ---- the top bar tightens up once the hero is behind you ----
      driven by an observer rather than the scroll handler below: that one is
