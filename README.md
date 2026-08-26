@@ -47,9 +47,9 @@ All prose is drafted from `../Content Dashboard/chun-voice.md`. Search `index.ht
 2. **Who I am** — the middle paragraphs are drafted from the voice guide. Swap in the two or three facts you actually want a stranger to know.
 3. **What I do** — client names are deliberately left out until you say which are okay to list publicly.
 
-The page has **four navigable sections** — Who I am, What I do, Where I'm at, Say hi. The left rail and the JS section-spy both list them; if you add or remove a section, update the `<nav id="rail">` list *and* the `sections` selector in the script.
+The page has **four navigable sections** — About, Work, Now, Contact. Two navs list them and the JS section-spy keeps both in sync: a floating pill bar at the top from 1000px up (`<nav id="topnav">`), and a hamburger drawer below that (`<nav id="drawer">`). If you add or remove a section, update **both** nav lists *and* the `sections` selector in the script.
 
-**How I Spend My Time** is a subsection *inside* What I do, not its own section — that's why the rail shows four entries and stays on "What I do" through both blocks. Four items, each ending in an outbound link with a ↗ arrow: Strava, UNBRKN., Instagram, the unbreakable mind. Link text and URL both live in the `<a class="go">` on each item.
+**How I Spend My Time** is a subsection *inside* What I do, not its own section — that's why the navs show four entries and stay on "Work" through both blocks. Four items, each ending in an outbound link with a ↗ arrow: Strava, UNBRKN., Instagram, the unbreakable mind. Link text and URL both live in the `<a class="go">` on each item.
 
 **Where I'm at** is a five-row label/value list — Building, Training, Learning, Where, Focused on. Edit the `<dt>`/`<dd>` pairs; add or drop rows by copying a `.now-row` block.
 
@@ -70,6 +70,7 @@ If you do regenerate them, **measure the result** rather than trusting that the 
 ## How it's put together
 
 - Palette and type come from your existing chun.mov link page (Fraunces + Space Mono, amber, warm paper), inverted to light.
-- Scroll behaviour: reveal-on-enter via one `IntersectionObserver` (fires once, then unobserves), a left rail that tracks the active section, a scroll-progress bar, sticky marginal photos, and a slow hero drift.
+- Scroll behaviour: reveal-on-enter via one `IntersectionObserver` (fires once, then unobserves), a top bar that tracks the active section and tightens up once the hero is behind you, a scroll-progress bar, sticky marginal photos, and a slow hero drift.
+- The bar's minimise is driven by its own `IntersectionObserver` on the hero, **not** by the scroll handler. That handler is rAF-throttled, so in a background tab it stalls and the bar would freeze in whichever state it was last in.
 - `prefers-reduced-motion: reduce` collapses all of it to instant. With JavaScript disabled the page renders fully visible rather than blank.
 - Contrast is AA-clean: body 15.9:1, secondary text 5.0:1, amber labels 5.25:1. `--amber` is decorative only; `--amber-deep` is the text-safe accent. If you change the palette, keep that split.

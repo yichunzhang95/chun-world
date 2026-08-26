@@ -24,7 +24,7 @@
   --paper:#f5ede1;
   --ink:#16130f;
   --ink-dim:#6f6355;
-  --amber:#b5701a;        /* decorative only: rules, rail, progress bar */
+  --amber:#b5701a;        /* decorative only: rules, nav, progress bar */
   --amber-deep:#8f5410;   /* text-safe accent, 5.2:1 on paper */
   --line:#ddd0bd;
   --card:#fbf6ec;
@@ -64,28 +64,38 @@ img{max-width:100%;display:block}
   background:var(--amber);transform:scaleX(0);transform-origin:0 50%;
 }
 
-/* ---------- left rail ---------- */
-#rail{
-  position:fixed;left:clamp(1.2rem,2.4vw,2.6rem);top:50%;transform:translateY(-50%);
-  z-index:15;display:none;
+/* ---------- floating top nav (full-size screens) ---------- */
+#topnav{
+  position:fixed;top:1.25rem;left:50%;transform:translateX(-50%);
+  z-index:22;display:none;align-items:center;gap:.15rem;
+  padding:.45rem .5rem;
+  background:var(--paper); /* fallback where color-mix is unsupported */
+  background:color-mix(in srgb,var(--paper) 86%,transparent);
+  -webkit-backdrop-filter:blur(14px) saturate(1.2);
+  backdrop-filter:blur(14px) saturate(1.2);
+  border:1px solid var(--line);border-radius:999px;
+  transition:top .5s var(--ease),padding .5s var(--ease),box-shadow .5s var(--ease);
 }
-#rail ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:1.05rem}
-#rail a{
-  display:flex;align-items:center;gap:.7rem;text-decoration:none;
-  font-family:var(--mono);font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;
-  color:var(--ink-dim);opacity:.5;transition:opacity .4s var(--ease),color .4s var(--ease);
+@media (min-width:1000px){#topnav{display:flex}}
+#topnav a{
+  display:block;text-decoration:none;border-radius:999px;
+  padding:.52rem 1.1rem;
+  font-family:var(--mono);font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ink-dim);white-space:nowrap;
+  transition:color .3s var(--ease),background-color .3s var(--ease),
+             padding .5s var(--ease),font-size .5s var(--ease);
 }
-#rail .tick{display:block;width:16px;height:1px;background:currentColor;transition:width .45s var(--ease)}
-#rail a:hover{opacity:.9}
-#rail a.active{opacity:1;color:var(--amber-deep)}
-#rail a.active .tick{width:34px;background:var(--amber)}
-/* only show the rail when there is an outer gutter wide enough to hold it */
-@media (min-width:1200px){
-  #rail{display:block}
-  body{padding-left:132px}
+#topnav a:hover,#topnav a:focus-visible{
+  color:var(--ink);background:color-mix(in srgb,var(--ink) 7%,transparent);
 }
+#topnav a.active{
+  color:var(--amber-deep);background:color-mix(in srgb,var(--amber) 15%,transparent);
+}
+/* minimised once the hero is behind you */
+#topnav.min{top:.65rem;padding:.28rem .34rem;box-shadow:0 8px 24px -14px rgba(22,19,15,.55)}
+#topnav.min a{padding:.42rem .9rem;font-size:.6rem}
 
-/* ---------- hamburger + side drawer: takes over where the rail stops ---------- */
+/* ---------- hamburger + side drawer: takes over where the top nav stops ---------- */
 #menubtn{
   position:fixed;top:1rem;right:1rem;z-index:26;
   width:44px;height:44px;padding:0;cursor:pointer;
@@ -140,7 +150,7 @@ html.menu-open #drawer{transform:none;visibility:visible;transition:transform .5
 #drawer a.active .num{color:var(--amber)}
 /* lock the page behind the drawer */
 html.menu-open{overflow:hidden}
-@media (min-width:1200px){#menubtn,#drawer,#scrim{display:none}}
+@media (min-width:1000px){#menubtn,#drawer,#scrim{display:none}}
 
 /* ---------- layout ---------- */
 .wrap{max-width:1180px;margin:0 auto;padding:0 var(--pad)}
@@ -343,6 +353,7 @@ footer.wrap{padding-block:clamp(3.5rem,7vh,5rem)}
   /* drawer still opens and closes, it just doesn't slide */
   #drawer,html.menu-open #drawer,#scrim,html.menu-open #scrim{transition:none}
   #menubtn .bars i{transition:none}
+  #topnav,#topnav a{transition:none}
 }
 </style>
 </head>
@@ -350,16 +361,14 @@ footer.wrap{padding-block:clamp(3.5rem,7vh,5rem)}
 
 <div id="progress" aria-hidden="true"></div>
 
-<nav id="rail" data-nav aria-label="Sections">
-  <ol>
-    <li><a href="#about"><span class="tick"></span>Who I am</a></li>
-    <li><a href="#work"><span class="tick"></span>What I do</a></li>
-    <li><a href="#now"><span class="tick"></span>Where I'm at</a></li>
-    <li><a href="#contact"><span class="tick"></span>Say hi</a></li>
-  </ol>
+<nav id="topnav" data-nav aria-label="Sections">
+  <a href="#about">About</a>
+  <a href="#work">Work</a>
+  <a href="#now">Now</a>
+  <a href="#contact">Contact</a>
 </nav>
 
-<!-- takes over below 1200px, where the rail is hidden -->
+<!-- takes over below 1000px, where the top nav is hidden -->
 <button id="menubtn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="drawer">
   <span class="bars" aria-hidden="true"><i></i><i></i><i></i></span>
 </button>
@@ -572,7 +581,7 @@ footer.wrap{padding-block:clamp(3.5rem,7vh,5rem)}
   });
 
   /* ---- active section, across both navs ----
-     a section now has two links (desktop rail + mobile bar), so each id maps
+     a section now has two links (top nav + mobile drawer), so each id maps
      to a list rather than a single element */
   var links = {};
   document.querySelectorAll('[data-nav] a').forEach(function (a) {
@@ -646,10 +655,10 @@ footer.wrap{padding-block:clamp(3.5rem,7vh,5rem)}
   /* the drawer only exists below 1200px; if the window grows past that, make
      sure we never leave the page scroll-locked */
   window.addEventListener('resize', function () {
-    if (menuOpen() && window.innerWidth >= 1200) closeMenu(false);
+    if (menuOpen() && window.innerWidth >= 1000) closeMenu(false);
   });
 
-  /* ---- eased scroll when a rail link is clicked ----
+  /* ---- eased scroll when a nav link is clicked ----
      driven in JS rather than left to CSS scroll-behavior so the motion matches
      the rest of the page: a long ease-in-out instead of the browser's short,
      abrupt default */
@@ -703,6 +712,23 @@ footer.wrap{padding-block:clamp(3.5rem,7vh,5rem)}
     });
   });
 
+  /* ---- the top bar tightens up once the hero is behind you ----
+     driven by an observer rather than the scroll handler below: that one is
+     rAF-throttled, so it stalls in background tabs and the bar would be stuck
+     in whichever state it was last in */
+  var topnav = document.getElementById('topnav');
+  var heroEl = document.getElementById('hero');
+  if (topnav && heroEl && 'IntersectionObserver' in window) {
+    var steps = [];
+    for (var t = 0; t <= 20; t++) steps.push(t / 20);
+    new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        /* hero is 100svh, so ratio 0.3 == scrolled 70% of the way past it */
+        topnav.classList.toggle('min', e.intersectionRatio < 0.3);
+      });
+    }, { threshold: steps }).observe(heroEl);
+  }
+
   /* ---- progress bar + parallax, rAF-throttled ---- */
   var bar = document.getElementById('progress');
   var heroInner = document.querySelector('.hero-inner');
@@ -718,6 +744,7 @@ footer.wrap{padding-block:clamp(3.5rem,7vh,5rem)}
     if (!reduce && heroInner && y < window.innerHeight) {
       heroInner.style.transform = 'translateY(' + (y * 0.14) + 'px)';
     }
+
     ticking = false;
   }
 
