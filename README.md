@@ -81,7 +81,7 @@ If you do regenerate them, **measure the result** rather than trusting that the 
 
 - Palette and type come from your existing chun.mov link page (Fraunces + Space Mono, amber, warm paper), inverted to light.
 - Scroll behaviour: reveal-on-enter via one `IntersectionObserver` (fires once, then unobserves), navs that track the active section, a top bar that tightens up once the hero is behind you, a scroll-progress bar, sticky marginal photos, and a slow hero drift.
-- **Nav clicks run an eased scroll in JS** (`easeOutQuart`, 450–900ms by distance), with wheel or touch cancelling it mid-flight. Duration is the `Math.min(900, Math.max(450, …))` line — the single knob if the pace needs tuning.
+- **Nav clicks run an eased scroll in JS** (`easeOutQuart`, 600–1300ms by distance), with wheel or touch cancelling it mid-flight. Duration is the `Math.min(1300, Math.max(600, …))` line — the single knob if the pace needs tuning.
 - **`scroll-behavior` must stay `auto`.** The animation calls `window.scrollTo` once per frame; with `smooth` set, each of those calls starts its own native animation toward the target, so the page trails the values being set and every jump feels rubber-banded. That combination is what made the scroll feel delayed, and it is easy to reintroduce by "helpfully" adding `scroll-behavior: smooth` back.
 - The curve is ease-**out**, deliberately. An ease-in-out covers under 1% of the distance in its first 10% of time, so the page looks frozen right after the click. Ease-out is at 34% by then.
 - The bar's minimise is driven by its own `IntersectionObserver` on the hero, **not** by the scroll handler. That handler is rAF-throttled, so in a background tab it stalls and the bar would freeze in whichever state it was last in.

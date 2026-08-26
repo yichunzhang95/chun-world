@@ -718,10 +718,13 @@ footer.wrap{padding-block:clamp(3.5rem,7vh,5rem)}
         return;
       }
 
-      /* short trips stay short; a full-page jump tops out at 900ms, and
-         ease-out means half the distance is covered in the first ~145ms, so
-         the extra length reads as a longer glide rather than a slower start */
-      var duration = Math.min(900, Math.max(450, Math.abs(distance) * 0.35));
+      /* short trips stay short; a full-page jump tops out at 1300ms. This is
+         longer than the 550-1100ms version that once felt laggy — it holds up
+         only because the curve is ease-out: half the distance is still covered
+         in the first ~205ms, so the added time lands at the end as a longer
+         glide rather than at the start as dead air. Push this much further and
+         the motion starts to feel indulgent. */
+      var duration = Math.min(1300, Math.max(600, Math.abs(distance) * 0.48));
       var t0 = null;
       var cancelled = false;
 
