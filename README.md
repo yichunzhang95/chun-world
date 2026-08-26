@@ -47,7 +47,17 @@ All prose is drafted from `../Content Dashboard/chun-voice.md`. Search `index.ht
 2. **Who I am** — the middle paragraphs are drafted from the voice guide. Swap in the two or three facts you actually want a stranger to know.
 3. **What I do** — client names are deliberately left out until you say which are okay to list publicly.
 
-The page has **four navigable sections** — About, Work, Now, Contact. Two navs list them and the JS section-spy keeps both in sync: a floating pill bar at the top from 1000px up (`<nav id="topnav">`), and a hamburger drawer below that (`<nav id="drawer">`). If you add or remove a section, update **both** nav lists *and* the `sections` selector in the script.
+The page has **four navigable sections** — About, Work, Now, Contact. Three navs list them and the JS section-spy keeps all of them in sync:
+
+| Nav | Shown | Labels |
+|---|---|---|
+| `<nav id="topnav">` floating pill bar | 1000px and up | About, Work, Now, Contact |
+| `<nav id="rail">` left rail | 1200px and up, alongside the bar | Who I am, What I do, Where I'm at, Say hi |
+| `<nav id="drawer">` hamburger drawer | below 1000px | About, Work, Now, Contact |
+
+The rail keeps its longer, more descriptive labels; the bar and drawer use the short ones. Align them if you'd rather they matched. The rail only appears at 1200px because `body{padding-left:132px}` reserves the gutter it sits in — the two go together, so don't remove one without the other.
+
+If you add or remove a section, update **all three** nav lists *and* the `sections` selector in the script.
 
 **How I Spend My Time** is a subsection *inside* What I do, not its own section — that's why the navs show four entries and stay on "Work" through both blocks. Four items, each ending in an outbound link with a ↗ arrow: Strava, UNBRKN., Instagram, the unbreakable mind. Link text and URL both live in the `<a class="go">` on each item.
 
@@ -70,7 +80,8 @@ If you do regenerate them, **measure the result** rather than trusting that the 
 ## How it's put together
 
 - Palette and type come from your existing chun.mov link page (Fraunces + Space Mono, amber, warm paper), inverted to light.
-- Scroll behaviour: reveal-on-enter via one `IntersectionObserver` (fires once, then unobserves), a top bar that tracks the active section and tightens up once the hero is behind you, a scroll-progress bar, sticky marginal photos, and a slow hero drift.
+- Scroll behaviour: reveal-on-enter via one `IntersectionObserver` (fires once, then unobserves), navs that track the active section, a top bar that tightens up once the hero is behind you, a scroll-progress bar, sticky marginal photos, and a slow hero drift.
+- **Nav clicks jump instantly.** `scroll-behavior` is left at `auto` and there is no JS easing — an animated scroll was tried and read as lag. If you reinstate smooth scrolling, note that `overflow-x` must stay on `html` rather than `body`, or Chrome ignores `scroll-behavior` entirely.
 - The bar's minimise is driven by its own `IntersectionObserver` on the hero, **not** by the scroll handler. That handler is rAF-throttled, so in a background tab it stalls and the bar would freeze in whichever state it was last in.
 - `prefers-reduced-motion: reduce` collapses all of it to instant. With JavaScript disabled the page renders fully visible rather than blank.
 - Contrast is AA-clean: body 15.9:1, secondary text 5.0:1, amber labels 5.25:1. `--amber` is decorative only; `--amber-deep` is the text-safe accent. If you change the palette, keep that split.
